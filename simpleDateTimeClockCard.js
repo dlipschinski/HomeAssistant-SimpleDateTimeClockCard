@@ -1,7 +1,10 @@
 class SimpleDateTimeClockCard extends HTMLElement
 {
+    _hass;
+    _toggle_switch_entity;
     set hass(hass)
     {
+        this._hass = hass;
         if (!this.content)
         {
             var config = this.config;
@@ -12,6 +15,7 @@ class SimpleDateTimeClockCard extends HTMLElement
             this.content.style.paddingTop = this.config.global_padding_top_size !== undefined ? this.config.global_padding_top_size : '15px';
             this.content.style.paddingBottom = this.config.global_padding_bottom_size !== undefined ? this.config.global_padding_bottom_size : '15px';
             this.content.style.textAlign = this.config.global_text_align !== undefined ? this.config.global_text_align : 'center';
+            this._toggle_switch_entity = this.config.toggle_switch_entity;
 
             var timeDiv = document.createElement('div');
             timeDiv.style.lineHeight = '1em';
@@ -23,6 +27,12 @@ class SimpleDateTimeClockCard extends HTMLElement
 
             card.appendChild(this.content);
             this.appendChild(card);
+            this.addEventListener("click", myFunction);
+            function myFunction() {
+              this._hass.callService('switch', 'toggle', {
+                entity_id: this._toggle_switch_entity
+            });
+            }
             var content = this.content;
             getContent();
             setInterval(getContent, this.config.global_update_interval_ms !== undefined ? this.config.global_update_interval_ms : 1000);
